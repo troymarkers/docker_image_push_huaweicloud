@@ -1,6 +1,6 @@
 [
     {
-      "image": "cloudreve/cloudreve",
+      "image": "docker.getoutline.com/outlinewiki/outline",
       "version": "latest",
       "architectures": [
         "amd64"
@@ -8,13 +8,20 @@
     },
     {
       "image": "postgres",
-      "version": "17",
+      "version": "18",
       "architectures": [
         "amd64"
       ]
     },
     {
       "image": "redis",
+      "version": "latest",
+      "architectures": [
+        "amd64"
+      ]
+    },
+    {
+      "image": "steveltn/https-portal",
       "version": "latest",
       "architectures": [
         "amd64"
