@@ -1,6 +1,20 @@
 [
     {
-      "image": "sickcodes/docker-osx",
+      "image": "cloudreve/cloudreve",
+      "version": "latest",
+      "architectures": [
+        "amd64"
+      ]
+    },
+    {
+      "image": "postgres",
+      "version": "17",
+      "architectures": [
+        "amd64"
+      ]
+    },
+    {
+      "image": "redis",
       "version": "latest",
       "architectures": [
         "amd64"
