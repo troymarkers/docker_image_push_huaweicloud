@@ -1,35 +1,7 @@
 [
     {
-      "image": "gravitl/netmaker",
-      "version": "v1.0.0",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "gravitl/netmaker-ui",
-      "version": "v1.0.0",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "caddy",
-      "version": "2.8.4",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "coredns/coredns",
-      "version": "1.10.1",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "eclipse-mosquitto",
-      "version": "2.0.15-openssl",
+      "image": "sickcodes/docker-osx",
+      "version": "latest",
       "architectures": [
         "amd64"
       ]
