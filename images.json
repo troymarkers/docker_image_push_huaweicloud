@@ -1,28 +1,14 @@
 [
     {
-      "image": "docker.getoutline.com/outlinewiki/outline",
-      "version": "latest",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
       "image": "postgres",
-      "version": "18",
+      "version": "17-alpine",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "redis",
-      "version": "latest",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "steveltn/https-portal",
-      "version": "latest",
+      "image": "ghcr.io/requarks/wiki",
+      "version": "2",
       "architectures": [
         "amd64"
       ]
