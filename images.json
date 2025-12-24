@@ -1,14 +1,14 @@
 [
     {
-      "image": "postgres",
-      "version": "17-alpine",
+      "image": "ghcr.io/wg-easy/wg-easy",
+      "version": "15",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "ghcr.io/requarks/wiki",
-      "version": "2",
+      "image": "traefik",
+      "version": "3.3",
       "architectures": [
         "amd64"
       ]
