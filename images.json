@@ -1,14 +1,21 @@
 [
     {
-      "image": "librenms/librenms",
-      "version": "latest",
+      "image": "mariadb",
+      "version": "10",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "traefik",
-      "version": "3.3",
+      "image": "redis",
+      "version": "7.2-alpine",
+      "architectures": [
+        "amd64"
+      ]
+    },
+    {
+      "image": "crazymax/msmtpd",
+      "version": "latest",
       "architectures": [
         "amd64"
       ]
