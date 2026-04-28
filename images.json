@@ -1,7 +1,7 @@
 [
     {
       "image": "cloudreve/cloudreve",
-      "version": "10",
+      "version": "v4",
       "architectures": [
         "amd64"
       ]
