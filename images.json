@@ -1,20 +1,20 @@
 [
     {
-      "image": "mariadb",
+      "image": "cloudreve/cloudreve",
       "version": "10",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "redis",
-      "version": "7.2-alpine",
+      "image": "postgres",
+      "version": "17",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "crazymax/msmtpd",
+      "image": "redis",
       "version": "latest",
       "architectures": [
         "amd64"
