@@ -1,21 +1,14 @@
 [
     {
-      "image": "cloudreve/cloudreve",
-      "version": "v4",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "postgres",
-      "version": "17",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "redis",
+      "image": "ghcr.io/nextcloud-releases/all-in-one",
       "version": "latest",
+      "architectures": [
+        "amd64"
+      ]
+    },
+    {
+      "image": "caddy",
+      "version": "alpine",
       "architectures": [
         "amd64"
       ]
