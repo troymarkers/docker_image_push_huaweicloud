@@ -1,6 +1,6 @@
 [
     {
-      "image": "docker.io/library/postgres",
+      "image": "postgres",
       "version": ":16-alpine",
       "architectures": [
         "amd64"
