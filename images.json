@@ -1,14 +1,14 @@
 [
     {
-      "image": "ghcr.io/nextcloud-releases/all-in-one",
-      "version": "latest",
+      "image": "docker.io/library/postgres",
+      "version": ":16-alpine",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "caddy",
-      "version": "alpine",
+      "image": "ghcr.io/goauthentik/server",
+      "version": "2026.2.2",
       "architectures": [
         "amd64"
       ]
