@@ -1,7 +1,7 @@
 [
     {
-      "image": "authelia",
-      "version": "latest",
+      "image": "authelia/authelia",
+      "version": "master",
       "architectures": [
         "amd64"
       ]
