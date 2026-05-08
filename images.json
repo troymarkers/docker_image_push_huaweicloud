@@ -1,7 +1,14 @@
 [
     {
-      "image": "authelia/authelia",
-      "version": "master",
+      "image": "snipe/snipe-it",
+      "version": "latest",
+      "architectures": [
+        "amd64"
+      ]
+    },
+    {
+      "image": "mariadb",
+      "version": "11.4.7",
       "architectures": [
         "amd64"
       ]
