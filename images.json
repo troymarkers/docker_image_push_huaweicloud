@@ -1,13 +1,13 @@
 [
     {
       "image": "quay.io/keycloak/keycloak",
-      "version": "26.6.1",
+      "version": "latest",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "mariadb",
+      "image": "postgres",
       "version": "latest",
       "architectures": [
         "amd64"
