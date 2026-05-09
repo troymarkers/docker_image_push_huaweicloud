@@ -1,14 +1,14 @@
 [
     {
-      "image": "snipe/snipe-it",
-      "version": "latest",
+      "image": "quay.io/keycloak/keycloak",
+      "version": "26.6.1",
       "architectures": [
         "amd64"
       ]
     },
     {
       "image": "mariadb",
-      "version": "11.4.7",
+      "version": "latest",
       "architectures": [
         "amd64"
       ]
