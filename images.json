@@ -1,14 +1,7 @@
 [
     {
-      "image": "quay.io/keycloak/keycloak",
-      "version": "latest",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "postgres",
-      "version": "latest",
+      "image": "ubuntu",
+      "version": "22.04",
       "architectures": [
         "amd64"
       ]
