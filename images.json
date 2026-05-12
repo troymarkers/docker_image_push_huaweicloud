@@ -1,7 +1,7 @@
 [
     {
-      "image": "ubuntu",
-      "version": "22.04",
+      "image": "postgres",
+      "version": "latest",
       "architectures": [
         "amd64"
       ]
