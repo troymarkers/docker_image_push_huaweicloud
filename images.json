@@ -1,6 +1,6 @@
 [
     {
-      "image": "postgres",
+      "image": "osixia/openldap",
       "version": "latest",
       "architectures": [
         "amd64"
