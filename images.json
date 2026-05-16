@@ -1,6 +1,6 @@
 [
     {
-      "image": "amir20/dozzle",
+      "image": "osixia/phpldapadmin",
       "version": "latest",
       "architectures": [
         "amd64"
