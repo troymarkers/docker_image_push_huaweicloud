@@ -1,6 +1,6 @@
 [
     {
-      "image": "osixia/openldap",
+      "image": "amir20/dozzle",
       "version": "latest",
       "architectures": [
         "amd64"
