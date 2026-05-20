@@ -1,6 +1,6 @@
 [
     {
-      "image": "osixia/phpldapadmin",
+      "image": "quay.io/oauth2-proxy/oauth2-proxy:",
       "version": "latest",
       "architectures": [
         "amd64"
