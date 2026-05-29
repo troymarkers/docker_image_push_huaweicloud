@@ -1,9 +1,22 @@
 [
     {
-      "image": "quay.io/oauth2-proxy/oauth2-proxy",
+      "image": "linuxserver/wireshark",
       "version": "latest",
       "architectures": [
         "amd64"
       ]
-    }
+    },
+    {
+      "image": "linuxserver/chrome",
+      "version": "latest",
+      "architectures": [
+        "amd64"
+      ]
+    },
+    {
+      "image": "dockurr/windows",
+      "version": "latest",
+      "architectures": [
+        "amd64"
+      ]
 ]
