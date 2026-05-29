@@ -1,21 +1,14 @@
 [
     {
-      "image": "linuxserver/wireshark",
+      "image": "dockurr/macos",
       "version": "latest",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "linuxserver/chrome",
-      "version": "latest",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "dockurr/windows",
-      "version": "latest",
+      "image": "ubuntu",
+      "version": "26.04",
       "architectures": [
         "amd64"
       ]
