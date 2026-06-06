@@ -1,13 +1,13 @@
 [
     {
-      "image": "prom/prometheus",
+      "image": "dockurr/windows",
       "version": "latest",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "grafana/grafana-enterprise",
+      "image": "ubuntu",
       "version": "latest",
       "architectures": [
         "amd64"
