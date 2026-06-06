@@ -1,14 +1,27 @@
 [
     {
-      "image": "dockurr/windows",
+      "image": "zabbix/zabbix-server-pgsql",
+      "version": "alpine-7.0-latest",
+      "architectures": [
+        "amd64"
+      ]
+    },
+    {
+      "image": "zabbix/zabbix-web-nginx-pgsql",
+      "version": "alpine-7.0-latest",
+      "architectures": [
+        "amd64"
+      ]
+    },{
+      "image": "postgres",
       "version": "latest",
       "architectures": [
         "amd64"
       ]
     },
     {
-      "image": "ubuntu",
-      "version": "latest",
+      "image": "zabbix/zabbix-snmptraps",
+      "version": "alpine-7.0-latest",
       "architectures": [
         "amd64"
       ]
