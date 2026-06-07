@@ -1,26 +1,6 @@
 [
     {
-      "image": "zabbix/zabbix-server-pgsql",
-      "version": "alpine-7.0-latest",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "zabbix/zabbix-web-nginx-pgsql",
-      "version": "alpine-7.0-latest",
-      "architectures": [
-        "amd64"
-      ]
-    },{
-      "image": "postgres",
-      "version": "latest",
-      "architectures": [
-        "amd64"
-      ]
-    },
-    {
-      "image": "zabbix/zabbix-snmptraps",
+      "image": "zabbix/zabbix-agent",
       "version": "alpine-7.0-latest",
       "architectures": [
         "amd64"
