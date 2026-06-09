@@ -1,7 +1,7 @@
 [
     {
-      "image": "zabbix/zabbix-agent",
-      "version": "alpine-7.0-latest",
+      "image": "postgres",
+      "version": "17-alpine",
       "architectures": [
         "amd64"
       ]
