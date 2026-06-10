@@ -76,7 +76,6 @@ jobs:
 
           # 标准化镜像名称
           clean_image=$(sed 's/@sha256.*//; s/[^a-zA-Z0-9._/-]//g' <<< "$image")
-          [[ "$clean_image" == */* ]] || clean_image="library/$clean_image"
 
           full_image="$image:$tag"
 
