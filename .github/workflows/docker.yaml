@@ -25,7 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y jq skopeo
+        sudo apt-get install -y jq
 
     - name: Docker Setup Buildx
       uses: docker/setup-buildx-action@v3
@@ -36,7 +36,7 @@ jobs:
     - name: Login to HuaweiCloud SWR
       run: |
         echo "Logging in to Huawei Cloud SWR..."
-        docker login -u "$HUAWEICLOUD_USER" -p $HUAWEICLOUD_PASSWORD $HUAWEICLOUD_REGISTRY
+        echo "$HUAWEICLOUD_PASSWORD" | docker login -u "$HUAWEICLOUD_USER" --password-stdin "$HUAWEICLOUD_REGISTRY"
       env:
         HUAWEICLOUD_USER: ${{ secrets.HW_REGISTRY_USER }}
         HUAWEICLOUD_PASSWORD: ${{ secrets.HW_REGISTRY_PASSWORD }}
@@ -44,6 +44,7 @@ jobs:
     - name: Process and push images
       run: |
         set -euo pipefail
+
         declare -A ARCH_MAP=(
           ["386"]="linux/386"
           ["amd64"]="linux/amd64"
@@ -57,60 +58,95 @@ jobs:
         )
 
         echo "Reading images from images.json..."
-        jq -c '.[]' images.json | while read -r item; do
+
+        # 使用进程替换替代管道，避免子 shell 中错误无法传播
+        while read -r item; do
           image=$(jq -r '.image' <<< "$item")
           version=$(jq -r '.version' <<< "$item")
-          
-          # 标准化镜像名称
+
+          # 标准化镜像名称：去除 @sha256 摘要，过滤非法字符
           clean_image=$(sed 's/@sha256.*//; s/[^a-zA-Z0-9._/-]//g' <<< "$image")
           [[ "$clean_image" == */* ]] || clean_image="library/$clean_image"
 
-          echo "Processing image: $image with version: $version"
-          
-          # 构建完整的镜像标签
           if [[ -n "$version" ]]; then
             full_image="$image:$version"
+            base_tag="$version"
           else
             full_image="$image:latest"
+            base_tag="latest"
           fi
-            
-          # 多架构处理
-          jq -r '.architectures[]' <<< "$item" | while read -r arch; do
-            target_tag="${arch}-${version:-latest}"
-            platform=${ARCH_MAP[$arch]}
-            
-            echo "Processing architecture: $arch (platform: $platform)"
-            
-            # 拉取指定架构镜像
-            echo "Pulling image $full_image for platform $platform..."
-            docker pull --platform "$platform" "$full_image"
-            
-            # 确定目标镜像路径
-            if [[ "$image" == "redis" ]]; then
-              hw_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/redis"
-            elif [[ "$image" == "elasticsearch/elasticsearch" ]]; then
-              hw_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/elasticsearch/elasticsearch"
-            elif [[ "$clean_image" =~ ^([^/]*)/(.*)$ ]]; then
-              namespace="${BASH_REMATCH[1]}"
-              repo="${BASH_REMATCH[2]}"
-              hw_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/$namespace/$repo"
-            else
-              hw_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/$(basename $clean_image)"
+
+          echo "============================================"
+          echo "Image: $image  |  Version: $base_tag"
+
+          # 统一规则生成目标路径：registry/org/namespace/repo
+          if [[ "$clean_image" =~ ^([^/]+)/(.+)$ ]]; then
+            hw_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+          else
+            hw_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/$clean_image"
+          fi
+          echo "Target: $hw_image"
+
+          # 收集架构列表（用于后续 manifest 判断）
+          arch_list=()
+          while read -r arch; do
+            arch_list+=("$arch")
+          done < <(jq -r '.architectures[]' <<< "$item")
+
+          declare -a arch_tags=()
+
+          for arch in "${arch_list[@]}"; do
+            platform=${ARCH_MAP[$arch]:-}
+            if [[ -z "$platform" ]]; then
+              echo "WARNING: 未知架构 '$arch'，跳过"
+              continue
             fi
-            
-            echo "Tagging image as ${hw_image}:${target_tag}..."
-            docker tag "$full_image" "${hw_image}:${target_tag}"
-            
-            echo "Pushing image ${hw_image}:${target_tag} to Huawei Cloud SWR..."
-            docker push "${hw_image}:${target_tag}"
-            
-            # 清理中间镜像
-            echo "Cleaning up intermediate images..."
-            docker rmi "$full_image" "${hw_image}:${target_tag}" || true
+
+            arch_tag="${base_tag}-${arch}"
+            arch_tags+=("${hw_image}:${arch_tag}")
+
+            echo "--- ${arch} (${platform}) ---"
+
+            # 拉取指定架构镜像
+            echo "  Pulling $full_image for $platform..."
+            docker pull --platform "$platform" "$full_image"
+
+            # 标记并推送架构专属 tag
+            echo "  Tagging ${hw_image}:${arch_tag} ..."
+            docker tag "$full_image" "${hw_image}:${arch_tag}"
+
+            echo "  Pushing ${hw_image}:${arch_tag} ..."
+            docker push "${hw_image}:${arch_tag}"
+
+            # 单架构：同时打一个不带架构后缀的通用 tag
+            if [[ ${#arch_list[@]} -eq 1 ]]; then
+              echo "  Also tagging as ${hw_image}:${base_tag} ..."
+              docker tag "$full_image" "${hw_image}:${base_tag}"
+              echo "  Pushing ${hw_image}:${base_tag} ..."
+              docker push "${hw_image}:${base_tag}"
+            fi
+
+            # 清理本架构中间镜像
+            docker rmi "$full_image" "${hw_image}:${arch_tag}" || true
           done
-        done
+
+          # 多架构：创建 manifest list，统一入口
+          if [[ ${#arch_list[@]} -gt 1 ]]; then
+            echo ">>> Creating multi-arch manifest: ${hw_image}:${base_tag}"
+            manifest_args=()
+            for tag in "${arch_tags[@]}"; do
+              manifest_args+=("--amend" "$tag")
+            done
+            docker manifest create "${hw_image}:${base_tag}" "${manifest_args[@]}"
+            docker manifest push "${hw_image}:${base_tag}"
+            echo ">>> Multi-arch manifest pushed successfully."
+          fi
+
+          echo ""
+        done < <(jq -c '.[]' images.json)
+
         # 全局清理
-        echo "Performing global cleanup of unused images..."
+        echo "Performing global cleanup..."
         docker image prune -f
       env:
         HUAWEICLOUD_REGISTRY: ${{ secrets.HW_REGISTRY }}
