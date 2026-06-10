@@ -44,13 +44,34 @@ jobs:
           # 跳过空行和注释行
           [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
 
-          # 解析 image:tag 格式（无冒号则默认 latest）
-          if [[ "$line" == *:* ]]; then
-            image="${line%:*}"
-            tag="${line##*:}"
+          # 去掉行尾注释（# 前面有空格的情况）
+          line="${line%%#*}"
+
+          # 解析格式：image:tag [arch]
+          # arch 可选，不写默认 amd64
+          # arch 简写如 arm64 会自动补全为 linux/arm64
+          rest="$line"
+          img_tag="${rest%% *}"
+          arch_raw="${rest#"$img_tag"}"
+          arch_raw="${arch_raw## }"
+
+          # 解析 image:tag（无冒号则默认 latest）
+          if [[ "$img_tag" == *:* ]]; then
+            image="${img_tag%:*}"
+            tag="${img_tag##*:}"
           else
-            image="$line"
+            image="$img_tag"
             tag="latest"
+          fi
+
+          # 处理架构：未指定默认 amd64，简写自动补 linux/ 前缀
+          if [[ -z "$arch_raw" ]]; then
+            arch_raw="amd64"
+          fi
+          if [[ "$arch_raw" != */* ]]; then
+            platform="linux/$arch_raw"
+          else
+            platform="$arch_raw"
           fi
 
           # 标准化镜像名称
@@ -60,7 +81,7 @@ jobs:
           full_image="$image:$tag"
 
           echo "============================================"
-          echo "Image: $image  |  Tag: $tag"
+          echo "Image: $image  |  Tag: $tag  |  Arch: $arch_raw"
 
           # 生成 SWR 目标路径：registry/org/namespace/repo
           if [[ "$clean_image" =~ ^([^/]+)/(.+)$ ]]; then
@@ -70,13 +91,12 @@ jobs:
           fi
           echo "Target: $hw_image"
 
-          # 拉取 amd64 镜像（默认架构）
-          platform="linux/amd64"
+          # 拉取指定架构镜像
           echo "  Pulling $full_image for $platform..."
           docker pull --platform "$platform" "$full_image"
 
           # 推送架构专属标签
-          arch_tag="${tag}-amd64"
+          arch_tag="${tag}-${arch_raw}"
           echo "  Tagging ${hw_image}:${arch_tag} ..."
           docker tag "$full_image" "${hw_image}:${arch_tag}"
           echo "  Pushing ${hw_image}:${arch_tag} ..."

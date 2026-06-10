@@ -63,27 +63,31 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 
 ### 添加镜像
 #### txt文件内容
-打开 `images.txt` 文件，每行一个镜像，格式为 `镜像名:版本号`：<br>
+打开 `images.txt` 文件，每行一个镜像，格式为 `镜像名:版本号 [架构]`：<br>
 - 官方镜像：直接写镜像名，如 `postgres:19beta1-trixie`、`nginx:stable-perl`<br>
 - 第三方镜像：保持原命名空间，如 `bitnami/nginx:latest`<br>
 - 不写版本号默认使用 `latest`，如 `redis` 等价于 `redis:latest`<br>
+- 架构可选：不写默认 `amd64`，也可指定 `arm64`、`arm/v7` 等<br>
+- 架构简写自动补全：写 `arm64` 等价于 `linux/arm64`，写 `linux/arm/v7` 保持原样<br>
 - 支持 `#` 开头的注释行<br>
-- 默认拉取 `linux/amd64` 架构<br>
 
 #### 标签规则
 推送后在华为云 SWR 中会生成两个标签：<br>
-- **架构标签**：`{版本}-amd64`，如 `19beta1-trixie-amd64`<br>
+- **架构标签**：`{版本}-{架构}`，如 `19beta1-trixie-amd64`、`stable-perl-arm64`<br>
 - **通用标签**：`{版本}`，如 `19beta1-trixie`，可直接拉取无需指定架构<br>
 
 #### 示例
 `images.txt` 内容如下：
 ```
-# 数据库
+# 数据库（默认 amd64）
 postgres:19beta1-trixie
 redis:7-alpine
 
-# Web 服务
-nginx:stable-perl
+# 指定 ARM 架构
+nginx:stable-perl arm64
+
+# 完整平台字符串
+alpine:3.21 linux/arm/v7
 
 # 第三方镜像
 bitnami/kafka:3.6
