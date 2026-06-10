@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths: 
-      - 'images.json'
+      - 'images.txt'
 
 env:
   HUAWEICLOUD_REGISTRY: "${{ secrets.HW_REGISTRY }}" 
@@ -57,7 +57,7 @@ jobs:
           ["s390x"]="linux/s390x"
         )
 
-        echo "Reading images from images.json..."
+        echo "Reading images from images.txt..."
 
         # 使用进程替换替代管道，避免子 shell 中错误无法传播
         while read -r item; do
@@ -143,7 +143,7 @@ jobs:
           fi
 
           echo ""
-        done < <(jq -c '.[]' images.json)
+        done < <(jq -c '.[]' images.txt)
 
         # 全局清理
         echo "Performing global cleanup..."

@@ -63,7 +63,7 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 
 ### 添加镜像
 #### json文件内容
-打开images.json文件，根据docker官方的镜像信息填写需要同步的镜像信息<br>
+打开images.txt文件，根据docker官方的镜像信息填写需要同步的镜像信息<br>
 - image字段：填写镜像仓库地址，支持以下格式：<br>
     - 官方镜像<br>
     - 第三方镜像：bitnami/nginx → 保持原命名空间<br>
@@ -143,7 +143,7 @@ on:
     branches:
       - main
     paths:
-      - 'images.json'
+      - 'images.txt'
 ```
 
 > **注意**：`schedule` 事件仅对默认分支（main）生效，且最小间隔为 5 分钟。GitHub 在负载高时可能会延迟触发。

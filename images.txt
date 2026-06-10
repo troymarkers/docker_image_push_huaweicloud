@@ -1,7 +1,7 @@
 [
     {
       "image": "postgres",
-      "version": "18-alpine",
+      "version": "19beta1-trixie",
       "architectures": [
         "amd64"
       ]
