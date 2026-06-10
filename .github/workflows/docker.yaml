@@ -109,11 +109,11 @@ jobs:
             echo "  Pushing ${hw_image}:${tag} ..."
             docker push "${hw_image}:${tag}"
           else
-            # 未指定架构：仅推送通用标签
-            echo "  Tagging ${hw_image}:${tag} ..."
-            docker tag "$full_image" "${hw_image}:${tag}"
-            echo "  Pushing ${hw_image}:${tag} ..."
-            docker push "${hw_image}:${tag}"
+            # 未指定架构：仅推送带 amd64 架构后缀的标签
+            echo "  Tagging ${hw_image}:${tag}-amd64 ..."
+            docker tag "$full_image" "${hw_image}:${tag}-amd64"
+            echo "  Pushing ${hw_image}:${tag}-amd64 ..."
+            docker push "${hw_image}:${tag}-amd64"
           fi
 
           # 清理
