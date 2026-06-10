@@ -100,3 +100,9 @@ jobs:
         HUAWEICLOUD_ORG_NAME: ${{ secrets.HW_ORG_NAME }}
         HUAWEICLOUD_USER: ${{ secrets.HW_REGISTRY_USER }}
         HUAWEICLOUD_PASSWORD: ${{ secrets.HW_REGISTRY_PASSWORD }}
+
+    - name: Cleanup credentials
+      if: always()
+      run: |
+        docker logout "$HUAWEICLOUD_REGISTRY" || true
+        rm -f /home/runner/.docker/config.json || true
