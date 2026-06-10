@@ -76,9 +76,15 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
     - linux/arm/v6：armv6<br>
     - linux/arm/v7：armv7<br>
     - linux/arm64/v8：arm64v8<br>
-    - linux/mips64le：mips64le<br>
     - linux/ppc64le：ppc64le<br>
+    - linux/riscv64：riscv64<br>
     - linux/s390x：s390x<br>
+
+#### 镜像标签规则
+- **架构专属标签**：每个架构会生成 `{version}-{arch}` 格式的标签，如 `18-alpine-amd64`、`stable-perl-armv5`。
+- **通用标签**：单架构镜像会自动额外打一个不带架构后缀的通用标签（如 `18-alpine`），可直接拉取无需指定架构。
+- **多架构 Manifest**：多架构镜像会自动创建 manifest list，使用通用标签（如 `noble-20250127`）即可自动匹配服务器架构，无需手动选择。
+  - 拉取示例：`docker pull swr.cn-north-4.myhuaweicloud.com/{组织名}/ubuntu:noble-20250127`（自动适配 amd64/arm64 等）<br>
 
 #### 示例
 
