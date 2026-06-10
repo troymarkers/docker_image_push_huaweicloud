@@ -28,7 +28,7 @@ jobs:
 
     - name: Login, process and push images
       run: |
-        set -euo pipefail
+        set -uo pipefail
 
         # 登录华为云 SWR
         echo "Logging in to Huawei Cloud SWR..."
