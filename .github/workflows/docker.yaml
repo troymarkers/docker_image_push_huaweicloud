@@ -65,8 +65,10 @@ jobs:
           fi
 
           # 处理架构：未指定默认 amd64，简写自动补 linux/ 前缀
+          arch_specified="true"
           if [[ -z "$arch_raw" ]]; then
             arch_raw="amd64"
+            arch_specified="false"
           fi
           if [[ "$arch_raw" != */* ]]; then
             platform="linux/$arch_raw"
@@ -94,21 +96,28 @@ jobs:
           echo "  Pulling $full_image for $platform..."
           docker pull --platform "$platform" "$full_image"
 
-          # 推送架构专属标签
-          arch_tag="${tag}-${arch_raw}"
-          echo "  Tagging ${hw_image}:${arch_tag} ..."
-          docker tag "$full_image" "${hw_image}:${arch_tag}"
-          echo "  Pushing ${hw_image}:${arch_tag} ..."
-          docker push "${hw_image}:${arch_tag}"
+          if [[ "$arch_specified" == "true" ]]; then
+            # 显式指定架构：推送架构标签 + 通用标签
+            arch_tag="${tag}-${arch_raw}"
+            echo "  Tagging ${hw_image}:${arch_tag} ..."
+            docker tag "$full_image" "${hw_image}:${arch_tag}"
+            echo "  Pushing ${hw_image}:${arch_tag} ..."
+            docker push "${hw_image}:${arch_tag}"
 
-          # 推送通用标签
-          echo "  Tagging ${hw_image}:${tag} ..."
-          docker tag "$full_image" "${hw_image}:${tag}"
-          echo "  Pushing ${hw_image}:${tag} ..."
-          docker push "${hw_image}:${tag}"
+            echo "  Tagging ${hw_image}:${tag} ..."
+            docker tag "$full_image" "${hw_image}:${tag}"
+            echo "  Pushing ${hw_image}:${tag} ..."
+            docker push "${hw_image}:${tag}"
+          else
+            # 未指定架构：仅推送通用标签
+            echo "  Tagging ${hw_image}:${tag} ..."
+            docker tag "$full_image" "${hw_image}:${tag}"
+            echo "  Pushing ${hw_image}:${tag} ..."
+            docker push "${hw_image}:${tag}"
+          fi
 
           # 清理
-          docker rmi "$full_image" "${hw_image}:${arch_tag}" || true
+          docker rmi "$full_image" || true
           echo ""
         done < images.txt
 

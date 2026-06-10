@@ -72,9 +72,8 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 - 支持 `#` 开头的注释行<br>
 
 #### 标签规则
-推送后在华为云 SWR 中会生成两个标签：<br>
-- **架构标签**：`{版本}-{架构}`，如 `19beta1-trixie-amd64`、`stable-perl-arm64`<br>
-- **通用标签**：`{版本}`，如 `19beta1-trixie`，可直接拉取无需指定架构<br>
+- **不指定架构**（默认）：仅推送通用标签，如 `19beta1-trixie`<br>
+- **指定架构**：同时推送架构标签和通用标签，如 `stable-perl-arm64` + `stable-perl`<br>
 
 #### 示例
 `images.txt` 内容如下：
