@@ -62,63 +62,31 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 
 
 ### 添加镜像
-#### json文件内容
-打开images.txt文件，根据docker官方的镜像信息填写需要同步的镜像信息<br>
-- image字段：填写镜像仓库地址，支持以下格式：<br>
-    - 官方镜像<br>
-    - 第三方镜像：bitnami/nginx → 保持原命名空间<br>
-    - 带标签镜像：alpine:3.18 → 自动剥离标签保留名称<br>
-- version字段：镜像版本号，如latest，noble-20250127等。
-- architectures字段：填写镜像的系统架构，支持同步多架构的镜像，需与Docker官方平台标识的架构严格对应，对应关系如下。
-    - linux/386：386<br>
-    - linux/amd64：amd64<br>
-    - linux/arm/v5：armv5<br>
-    - linux/arm/v6：armv6<br>
-    - linux/arm/v7：armv7<br>
-    - linux/arm64/v8：arm64v8<br>
-    - linux/ppc64le：ppc64le<br>
-    - linux/riscv64：riscv64<br>
-    - linux/s390x：s390x<br>
+#### txt文件内容
+打开 `images.txt` 文件，每行一个镜像，格式为 `镜像名:版本号`：<br>
+- 官方镜像：直接写镜像名，如 `postgres:19beta1-trixie`、`nginx:stable-perl`<br>
+- 第三方镜像：保持原命名空间，如 `bitnami/nginx:latest`<br>
+- 不写版本号默认使用 `latest`，如 `redis` 等价于 `redis:latest`<br>
+- 支持 `#` 开头的注释行<br>
+- 默认拉取 `linux/amd64` 架构<br>
 
-#### 镜像标签规则
-- **架构专属标签**：每个架构会生成 `{version}-{arch}` 格式的标签，如 `18-alpine-amd64`、`stable-perl-armv5`。
-- **通用标签**：单架构镜像会自动额外打一个不带架构后缀的通用标签（如 `18-alpine`），可直接拉取无需指定架构。
-- **多架构 Manifest**：多架构镜像会自动创建 manifest list，使用通用标签（如 `noble-20250127`）即可自动匹配服务器架构，无需手动选择。
-  - 拉取示例：`docker pull swr.cn-north-4.myhuaweicloud.com/{组织名}/ubuntu:noble-20250127`（自动适配 amd64/arm64 等）<br>
+#### 标签规则
+推送后在华为云 SWR 中会生成两个标签：<br>
+- **架构标签**：`{版本}-amd64`，如 `19beta1-trixie-amd64`<br>
+- **通用标签**：`{版本}`，如 `19beta1-trixie`，可直接拉取无需指定架构<br>
 
 #### 示例
-
-**nginx镜像信息如下：**<br>
-![image](https://github.com/user-attachments/assets/e3489aac-a15e-4e38-a087-5e1d924f81f0)
-<br>
-**ubuntu镜像信息如下：**<br>
-![image](https://github.com/user-attachments/assets/b4f484ba-4fc1-4f1d-970c-cbea74da2b80)
-<br>
-根据图中所示的信息编写的json文件如下：
+`images.txt` 内容如下：
 ```
-[
-    {
-    "image": "ubuntu",
-    "version": "noble-20250127",
-    "architectures": [
-      "amd64", 
-      "armv7",
-      "arm64v8",
-      "ppc64le",
-      "riscv64",
-      "s390x"
-    ]
-  },
-  {
-    "image": "nginx",
-    "version": "stable-perl",
-    "architectures": [
-      "386",
-      "amd64",
-      "armv5"
-    ]
-  },
-]
+# 数据库
+postgres:19beta1-trixie
+redis:7-alpine
+
+# Web 服务
+nginx:stable-perl
+
+# 第三方镜像
+bitnami/kafka:3.6
 ```
 
 提交文件后，会自动执行Github Action，向华为云镜像仓库上传镜像<br>

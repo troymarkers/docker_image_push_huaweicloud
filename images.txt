@@ -1,9 +1,1 @@
-[
-    {
-      "image": "postgres",
-      "version": "19beta1-trixie",
-      "architectures": [
-        "amd64"
-      ]
-    }
-]
+postgres:19beta1-trixie

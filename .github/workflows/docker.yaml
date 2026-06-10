@@ -25,13 +25,6 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y jq
-
-    - name: Docker Setup Buildx
-      uses: docker/setup-buildx-action@v4
-      with:
-        driver: docker-container
-        platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
 
     - name: Login to HuaweiCloud SWR
       run: |
@@ -45,41 +38,31 @@ jobs:
       run: |
         set -euo pipefail
 
-        declare -A ARCH_MAP=(
-          ["386"]="linux/386"
-          ["amd64"]="linux/amd64"
-          ["armv5"]="linux/arm/v5"
-          ["armv6"]="linux/arm/v6"
-          ["armv7"]="linux/arm/v7"
-          ["arm64v8"]="linux/arm64/v8"
-          ["ppc64le"]="linux/ppc64le"
-          ["riscv64"]="linux/riscv64"
-          ["s390x"]="linux/s390x"
-        )
-
         echo "Reading images from images.txt..."
 
-        # 使用进程替换替代管道，避免子 shell 中错误无法传播
-        while read -r item; do
-          image=$(jq -r '.image' <<< "$item")
-          version=$(jq -r '.version' <<< "$item")
+        while read -r line; do
+          # 跳过空行和注释行
+          [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
 
-          # 标准化镜像名称：去除 @sha256 摘要，过滤非法字符
+          # 解析 image:tag 格式（无冒号则默认 latest）
+          if [[ "$line" == *:* ]]; then
+            image="${line%:*}"
+            tag="${line##*:}"
+          else
+            image="$line"
+            tag="latest"
+          fi
+
+          # 标准化镜像名称
           clean_image=$(sed 's/@sha256.*//; s/[^a-zA-Z0-9._/-]//g' <<< "$image")
           [[ "$clean_image" == */* ]] || clean_image="library/$clean_image"
 
-          if [[ -n "$version" ]]; then
-            full_image="$image:$version"
-            base_tag="$version"
-          else
-            full_image="$image:latest"
-            base_tag="latest"
-          fi
+          full_image="$image:$tag"
 
           echo "============================================"
-          echo "Image: $image  |  Version: $base_tag"
+          echo "Image: $image  |  Tag: $tag"
 
-          # 统一规则生成目标路径：registry/org/namespace/repo
+          # 生成 SWR 目标路径：registry/org/namespace/repo
           if [[ "$clean_image" =~ ^([^/]+)/(.+)$ ]]; then
             hw_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
           else
@@ -87,65 +70,29 @@ jobs:
           fi
           echo "Target: $hw_image"
 
-          # 收集架构列表（用于后续 manifest 判断）
-          arch_list=()
-          while read -r arch; do
-            arch_list+=("$arch")
-          done < <(jq -r '.architectures[]' <<< "$item")
+          # 拉取 amd64 镜像（默认架构）
+          platform="linux/amd64"
+          echo "  Pulling $full_image for $platform..."
+          docker pull --platform "$platform" "$full_image"
 
-          declare -a arch_tags=()
+          # 推送架构专属标签
+          arch_tag="${tag}-amd64"
+          echo "  Tagging ${hw_image}:${arch_tag} ..."
+          docker tag "$full_image" "${hw_image}:${arch_tag}"
+          echo "  Pushing ${hw_image}:${arch_tag} ..."
+          docker push "${hw_image}:${arch_tag}"
 
-          for arch in "${arch_list[@]}"; do
-            platform=${ARCH_MAP[$arch]:-}
-            if [[ -z "$platform" ]]; then
-              echo "WARNING: 未知架构 '$arch'，跳过"
-              continue
-            fi
+          # 推送通用标签
+          echo "  Tagging ${hw_image}:${tag} ..."
+          docker tag "$full_image" "${hw_image}:${tag}"
+          echo "  Pushing ${hw_image}:${tag} ..."
+          docker push "${hw_image}:${tag}"
 
-            arch_tag="${base_tag}-${arch}"
-            arch_tags+=("${hw_image}:${arch_tag}")
-
-            echo "--- ${arch} (${platform}) ---"
-
-            # 拉取指定架构镜像
-            echo "  Pulling $full_image for $platform..."
-            docker pull --platform "$platform" "$full_image"
-
-            # 标记并推送架构专属 tag
-            echo "  Tagging ${hw_image}:${arch_tag} ..."
-            docker tag "$full_image" "${hw_image}:${arch_tag}"
-
-            echo "  Pushing ${hw_image}:${arch_tag} ..."
-            docker push "${hw_image}:${arch_tag}"
-
-            # 单架构：同时打一个不带架构后缀的通用 tag
-            if [[ ${#arch_list[@]} -eq 1 ]]; then
-              echo "  Also tagging as ${hw_image}:${base_tag} ..."
-              docker tag "$full_image" "${hw_image}:${base_tag}"
-              echo "  Pushing ${hw_image}:${base_tag} ..."
-              docker push "${hw_image}:${base_tag}"
-            fi
-
-            # 清理本架构中间镜像
-            docker rmi "$full_image" "${hw_image}:${arch_tag}" || true
-          done
-
-          # 多架构：创建 manifest list，统一入口
-          if [[ ${#arch_list[@]} -gt 1 ]]; then
-            echo ">>> Creating multi-arch manifest: ${hw_image}:${base_tag}"
-            manifest_args=()
-            for tag in "${arch_tags[@]}"; do
-              manifest_args+=("--amend" "$tag")
-            done
-            docker manifest create "${hw_image}:${base_tag}" "${manifest_args[@]}"
-            docker manifest push "${hw_image}:${base_tag}"
-            echo ">>> Multi-arch manifest pushed successfully."
-          fi
-
+          # 清理
+          docker rmi "$full_image" "${hw_image}:${arch_tag}" || true
           echo ""
-        done < <(jq -c '.[]' images.txt)
+        done < images.txt
 
-        # 全局清理
         echo "Performing global cleanup..."
         docker image prune -f
       env:
