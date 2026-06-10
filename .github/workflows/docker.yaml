@@ -26,17 +26,13 @@ jobs:
       run: |
         sudo apt-get update
 
-    - name: Login to HuaweiCloud SWR
-      run: |
-        echo "Logging in to Huawei Cloud SWR..."
-        echo "$HUAWEICLOUD_PASSWORD" | docker login -u "$HUAWEICLOUD_USER" --password-stdin "$HUAWEICLOUD_REGISTRY"
-      env:
-        HUAWEICLOUD_USER: ${{ secrets.HW_REGISTRY_USER }}
-        HUAWEICLOUD_PASSWORD: ${{ secrets.HW_REGISTRY_PASSWORD }}
-
-    - name: Process and push images
+    - name: Login, process and push images
       run: |
         set -euo pipefail
+
+        # 登录华为云 SWR
+        echo "Logging in to Huawei Cloud SWR..."
+        echo "$HUAWEICLOUD_PASSWORD" | docker login -u "$HUAWEICLOUD_USER" --password-stdin "$HUAWEICLOUD_REGISTRY"
 
         echo "Reading images from images.txt..."
 
@@ -123,14 +119,12 @@ jobs:
 
         echo "Performing global cleanup..."
         docker image prune -f
+
+        # 立即清除登录凭据
+        docker logout "$HUAWEICLOUD_REGISTRY" || true
+        rm -f /home/runner/.docker/config.json || true
       env:
         HUAWEICLOUD_REGISTRY: ${{ secrets.HW_REGISTRY }}
         HUAWEICLOUD_ORG_NAME: ${{ secrets.HW_ORG_NAME }}
         HUAWEICLOUD_USER: ${{ secrets.HW_REGISTRY_USER }}
         HUAWEICLOUD_PASSWORD: ${{ secrets.HW_REGISTRY_PASSWORD }}
-
-    - name: Cleanup credentials
-      if: always()
-      run: |
-        docker logout "$HUAWEICLOUD_REGISTRY" || true
-        rm -f /home/runner/.docker/config.json || true
