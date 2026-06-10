@@ -1,2 +1,2 @@
-postgres:19beta1-bookworm
 postgres:19beta1-alpine
+postgres:19beta1-bookworm
