@@ -2,3 +2,8 @@ zabbix/zabbix-agent:alpine-7.0-latest
 zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest
 zabbix/zabbix-server-pgsql:alpine-7.0-latest
 zabbix/zabbix-snmptraps:7.0-alpine-latest
+prom/prometheus:latest
+prom/snmp-exporter:latest
+prom/pushgateway:latest
+grafana/grafana-enterprise:latest
+grafana/grafana:latest
