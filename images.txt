@@ -7,4 +7,4 @@ prom/snmp-exporter:latest
 prom/pushgateway:latest
 grafana/grafana-enterprise:latest
 grafana/grafana:latest
-prom/snmp-generator
+prom/snmp-generator:latest
