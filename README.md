@@ -69,7 +69,10 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 - 不写版本号默认使用 `latest`，如 `redis` 等价于 `redis:latest`<br>
 - 架构可选：不写默认 `amd64`，也可指定 `arm64`、`arm/v7` 等<br>
 - 架构简写自动补全：写 `arm64` 等价于 `linux/arm64`，写 `linux/arm/v7` 保持原样<br>
-- 支持 `#` 开头的注释行<br>
+- 以 `#` 开头的行视为**注释**，不会同步，可用于：<br>
+  &nbsp;&nbsp;• 添加分类标题，按服务分组管理镜像<br>
+  &nbsp;&nbsp;• 临时禁用某个镜像而不删除该行<br>
+  &nbsp;&nbsp;• 在文件顶部添加格式说明和示例<br>
 
 #### 标签规则
 - **不指定架构**（默认）：仅推送 `{版本}-amd64` 标签，如 `19beta1-trixie-amd64`<br>
@@ -78,21 +81,33 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 #### 示例
 `images.txt` 内容如下：
 ```
+# ============================================
 # 数据库（默认 amd64）
+# ============================================
 postgres:19beta1-trixie
 redis:7-alpine
 
+# ============================================
 # 指定 ARM 架构
+# ============================================
 nginx:stable-perl arm64
-
-# 完整平台字符串
 alpine:3.21 linux/arm/v7
 
+# ============================================
 # 第三方镜像
+# ============================================
 bitnami/kafka:3.6
+
+# ============================================
+# 以下为被注释的镜像，不会同步
+# ============================================
+# mysql:8.0
+# node:18-alpine
 ```
 
-提交文件后，会自动执行Github Action，向华为云镜像仓库上传镜像<br>
+提交文件后，会自动执行 Github Action，向华为云镜像仓库上传镜像。<br>
+
+> **提示**：修改 `images.txt`、`push_images.sh` 或 `.github/workflows/docker.yaml` 均会触发自动同步。
 
 ### 使用镜像
 回到华为云，镜像仓库，点击任意镜像，可查看镜像状态，可以改成公开，拉取镜像免登录。<br>
@@ -102,14 +117,29 @@ bitnami/kafka:3.6
 ![image](https://github.com/user-attachments/assets/3671a5f6-2c12-4b86-b469-495b3dae1164)
 
 
-### 定时执行
-编辑 `.github/workflows/docker.yaml`，在 `on:` 下添加 `schedule` 即可定时执行（cron 使用 UTC 时区）：
+### 工作流触发条件
+
+编辑 `.github/workflows/docker.yaml` 可自定义触发方式。默认配置：
+
+```yaml
+on:
+  workflow_dispatch:                         # 手动触发
+  push:
+    branches:
+      - main
+    paths:
+      - 'images.txt'                        # images.txt 变更时触发
+```
+
+#### 定时执行
+在 `on:` 下添加 `schedule` 即可定时同步（cron 使用 UTC 时区）：
 
 ```yaml
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # 每天 UTC 00:00 执行（北京时间 08:00）
+    - cron: '0 0 * * *'                     # 每天 UTC 00:00（北京时间 08:00）
+    - cron: '0 12 * * *'                    # 每天 UTC 12:00（北京时间 20:00）
   push:
     branches:
       - main
@@ -117,4 +147,22 @@ on:
       - 'images.txt'
 ```
 
-> **注意**：`schedule` 事件仅对默认分支（main）生效，且最小间隔为 5 分钟。GitHub 在负载高时可能会延迟触发。
+#### PR 验证
+添加 `pull_request` 触发器可在发起 PR 时自动验证镜像配置：
+
+```yaml
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'images.txt'
+  pull_request:                             # PR 时验证
+    branches:
+      - main
+    paths:
+      - 'images.txt'
+```
+
+> **注意**：`schedule` 仅对默认分支（main）生效，最小间隔 5 分钟。`pull_request` 来自 fork 的 PR 无法访问 Secrets，推送会失败，仅用于格式验证。GitHub 在负载高时可能会延迟触发。

@@ -1,10 +1,20 @@
-zabbix/zabbix-agent:alpine-7.0-latest
-zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest
-zabbix/zabbix-server-pgsql:alpine-7.0-latest
-zabbix/zabbix-snmptraps:7.0-alpine-latest
-prom/prometheus:latest
-prom/snmp-exporter:latest
-prom/pushgateway:latest
-grafana/grafana-enterprise:latest
-grafana/grafana:latest
-prom/snmp-generator:latest
+# 格式：镜像名:版本号 [架构]
+# 示例：nginx:stable-perl arm64
+# 以 # 开头的行为注释，不会同步
+
+# zabbix/zabbix-agent:alpine-7.0-latest
+# zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest
+# zabbix/zabbix-server-pgsql:alpine-7.0-latest
+# zabbix/zabbix-snmptraps:7.0-alpine-latest
+
+# prom/prometheus:latest
+# prom/snmp-exporter:latest
+# prom/pushgateway:latest
+# prom/snmp-generator:latest
+
+
+# grafana/grafana-enterprise:latest
+# grafana/grafana:latest
+
+ubuntu:latest amd64
+postgres:18-alpine amd64
