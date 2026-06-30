@@ -63,8 +63,8 @@ while read -r line || [[ -n "$line" ]]; do
   echo "  Pulling $full_image for $platform..."
   docker pull --platform "$platform" "$full_image"
 
-  if [[ "$arch_specified" == "true" ]]; then
-    # 显式指定架构：推送架构标签 + 通用标签
+  if [[ "$arch_specified" == "true" && "$arch_raw" != "amd64" ]]; then
+    # 显式指定非 amd64 架构：推送架构标签 + 通用标签
     arch_tag="${tag}-${arch_raw}"
     echo "  Tagging ${hw_image}:${arch_tag} ..."
     docker tag "$full_image" "${hw_image}:${arch_tag}"
@@ -76,7 +76,7 @@ while read -r line || [[ -n "$line" ]]; do
     echo "  Pushing ${hw_image}:${tag} ..."
     docker push "${hw_image}:${tag}"
   else
-    # 未指定架构：仅推送带 amd64 架构后缀的标签
+    # 未指定架构或指定 amd64：仅推送带 amd64 架构后缀的标签
     echo "  Tagging ${hw_image}:${tag}-amd64 ..."
     docker tag "$full_image" "${hw_image}:${tag}-amd64"
     echo "  Pushing ${hw_image}:${tag}-amd64 ..."

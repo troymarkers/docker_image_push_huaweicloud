@@ -75,8 +75,8 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
   &nbsp;&nbsp;• 在文件顶部添加格式说明和示例<br>
 
 #### 标签规则
-- **不指定架构**（默认）：仅推送 `{版本}-amd64` 标签，如 `19beta1-trixie-amd64`<br>
-- **指定架构**：同时推送架构标签和通用标签，如 `stable-perl-arm64` + `stable-perl`<br>
+- **不指定架构**（默认）或指定 `amd64`：仅推送 `{版本}-amd64` 标签，如 `postgres:18-alpine amd64` → `18-alpine-amd64`<br>
+- **指定非 amd64 架构**（如 `arm64`）：同时推送架构标签和通用标签，如 `stable-perl-arm64` + `stable-perl`<br>
 
 #### 示例
 `images.txt` 内容如下：
