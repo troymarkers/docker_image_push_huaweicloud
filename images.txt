@@ -14,5 +14,6 @@
 # grafana/grafana-enterprise:latest amd64
 # grafana/grafana:latest amd64
 
-ubuntu:latest amd64
-postgres:18-alpine amd64
+# ubuntu:latest amd64
+# postgres:18-alpine amd64
+postgres:latest amd64
