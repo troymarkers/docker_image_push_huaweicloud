@@ -2,19 +2,19 @@
 # 示例：nginx:stable-perl arm64
 # 以 # 开头的行为注释，不会同步
 
-zabbix/zabbix-agent:alpine-7.0-latest amd64
-zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest amd64
-zabbix/zabbix-server-pgsql:alpine-7.0-latest amd64
-zabbix/zabbix-snmptraps:7.0-alpine-latest amd64
+# zabbix/zabbix-agent:alpine-7.0-latest amd64
+# zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest amd64
+# zabbix/zabbix-server-pgsql:alpine-7.0-latest amd64
+# zabbix/zabbix-snmptraps:7.0-alpine-latest amd64
 
-prom/prometheus:latest amd64
-prom/snmp-exporter:latest amd64
-prom/pushgateway:latest amd64
-prom/snmp-generator:latest amd64
+# prom/prometheus:latest amd64
+# prom/snmp-exporter:latest amd64
+# prom/pushgateway:latest amd64
+# prom/snmp-generator:latest amd64
+# grafana/grafana-enterprise:latest amd64
+# grafana/grafana:latest amd64
 
+# ubuntu:latest amd64
+# postgres:18-alpine amd64
 
-grafana/grafana-enterprise:latest amd64
-grafana/grafana:latest amd64
-
-ubuntu:latest amd64
-postgres:18-alpine amd64
+postgres:latest amd64
