@@ -16,4 +16,5 @@
 
 # ubuntu:latest amd64
 # postgres:18-alpine amd64
-postgres:latest amd64
+# postgres:latest amd64
+ghcr.io/wg-easy/wg-easy
